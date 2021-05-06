@@ -24,54 +24,15 @@ app.get('/', (req, res) => res.send('Hello World'));
 
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
 app.get('/chestionar', (req, res) => {
-	const listaIntrebari = [
-		{
-			titlu: 'Ce se vinde într-un magazin de papetărie?',
-			variante: [
-				'caiete, hârtie, creioane, penițe etc.', 
-				'medicamente',
-				'băuturi alcolice',
-				'alimente',
-				'obiecte destinate animaluțelor de companie'
-			],
-			corect: 0,
-		},
+	const fs = require('fs');
 
-		{
-			titlu: 'Ce obiect este cel mai ieftin într-un magazin de papetărie?',
-			variante: [
-				'Creionul', 
-				'Pixul', 
-				'Caietul', 
-				'Foaia A4'
-			],
-			corect: 3,
-		},
+	fs.readFile('intrebari.json', (err, data) => {
+		if (err) throw err;
+		let listaIntrebari = JSON.parse(data);
 
-		{
-			titlu: 'Puteti gasi pixuri de toate culorile într-o papetărie?',
-			variante: [
-				'Da',
-				'Nu',
-				'Probabil'
-			],	
-			corect: 2,
-		},
-
-		{
-			titlu: 'Exista mai multe magazine de papetării deschise decat de pariuri sportive?',
-			variante: [
-				'Da',
-				'Nu',
-				'Sigur ca nu'
-			],	
-			corect: 2,
-		}
-		//...
-	];
-
-	// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
-	res.render('chestionar', {intrebari: listaIntrebari});
+		// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
+		res.render('chestionar', {intrebari: listaIntrebari});
+	});
 });
 
 app.post('/rezultat-chestionar', (req, res) => {
