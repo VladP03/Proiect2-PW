@@ -1,0 +1,9 @@
+body {
+    /* background-color: rgb(26,26,26); */
+    background-image: url("../imagini/background5.jpg");
+    background-size: cover;
+    color: white;
+    
+    color: black;
+    text-indent: 15px;
+}
