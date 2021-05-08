@@ -1,12 +1,10 @@
 <form action="/rezultat-chestionar" method="POST">
+    <% var increment = 0; %>
     <% for (var key in intrebari) { %>
-        <h3> <%= intrebari[key].titlu %> </h3>
-
+        <h3> <%= intrebari[key].titlu %> </h3>      
         <% for (var index in intrebari[key].variante) {  %>
-            <input type="radio">
-            <label>
-                <%= intrebari[key].variante[index] %>
-            </label> <br>
+            <input type="radio" name="<%=key + '_' + index %>" value="<%=index %>">
+            <label> <%= intrebari[key].variante[index] %> </label> <br>
         <% } %>
         <br>
     <% } %>

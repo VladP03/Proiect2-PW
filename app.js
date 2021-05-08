@@ -21,14 +21,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
 // proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
 app.get('/', (req, res) => res.send('Hello World'));
-
+let listaIntrebari;
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
 app.get('/chestionar', (req, res) => {
 	const fs = require('fs');
 
 	fs.readFile('intrebari.json', (err, data) => {
 		if (err) throw err;
-		let listaIntrebari = JSON.parse(data);
+		listaIntrebari = JSON.parse(data);
 
 		// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
 		res.render('chestionar', {intrebari: listaIntrebari});
@@ -36,9 +36,22 @@ app.get('/chestionar', (req, res) => {
 });
 
 app.post('/rezultat-chestionar', (req, res) => {
-	//console.log(req.body);
-	//res.send("formular: " + JSON.stringify(req.body));
-	res.render("rezultat-chestionar");
+	console.log(req.body);
+
+	if(listaIntrebari) {
+		const respunsuriPrimite = req.body;
+
+		let numarRaspunsuriCorecte = 0;
+
+		for (let i=0;i<listaIntrebari.length;i++) {
+			const elementKey = i + '_' + listaIntrebari[i].corect;
+			if (respunsuriPrimite.hasOwnProperty(elementKey)) {
+				numarRaspunsuriCorecte++;
+			}
+		}
+		
+		res.render("rezultat-chestionar", { 'corecte' : numarRaspunsuriCorecte, 'total' :  listaIntrebari.length});
+	}
 });
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`));
