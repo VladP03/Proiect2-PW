@@ -1,3 +1,4 @@
+const cookieParser=require('cookie-parser');
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser')
@@ -17,11 +18,16 @@ app.use(bodyParser.json());
 // utilizarea unui algoritm de deep parsing care suportă obiecte în obiecte
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Laborator 11 -> cookie
+app.use(cookieParser());
+
 // la accesarea din browser adresei http://localhost:6789/ se va returna textul 'Hello World'
 // proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
 // proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
 app.get('/', (req, res) => {
-	res.render('index');
+	if (req.cookie != undefined) {
+		res.render('index');
+	}
 });
 
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
@@ -65,7 +71,14 @@ app.post('/verificare-autentificare', (req, res) => {
 	console.log(req.body);
 
 	// logica spre '/' sau '/autentificare'
-	res.render('');
+	//res.render('');
+	if (req.body.user == "ana" && req.body.pass == "mere") {
+		res.cookie("utilizator", req.body.user);
+		res.redirect('http://localhost:6789/');
+	} else {
+		res.cookie("utilizator", "mesajEroare");
+		res.redirect('http://localhost:6789/autentificare');
+	}
 });
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`));
