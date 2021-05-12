@@ -1,1 +1,5 @@
-<a href="/autentificare"> Autentificare </a>
+<% if (utilizator == "mesajEroare" || utilizator == undefined) { %>
+    <a href="/autentificare"> Autentificare </a>
+<% } else { %> 
+    <h2> Bine ai venit, <%= utilizator %>!</h2>
+<% } %>

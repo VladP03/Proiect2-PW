@@ -1,3 +1,7 @@
+<% if (utilizator == "mesajEroare") { %>
+    <h3 style="color:red"> Username or password incorrect! </h3>
+<% } %>
+
 <form action="/verificare-autentificare" method="POST">
     <label> Username </label>
     <input type="text" name="user"> <br><br>
