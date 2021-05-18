@@ -1,4 +1,5 @@
-const cookieParser=require('cookie-parser');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser')
@@ -12,27 +13,22 @@ app.set('view engine', 'ejs');
 // suport pentru layout-uri - implicit fișierul care reprezintă template-ul site-ului este views/layout.ejs
 app.use(expressLayouts);
 // directorul 'public' va conține toate resursele accesibile direct de către client (e.g., fișiere css, javascript, imagini)
-app.use(express.static('/public'))
+app.use(express.static('public'))
 // corpul mesajului poate fi interpretat ca json; datele de la formular se găsesc în format json în req.body
 app.use(bodyParser.json());
 // utilizarea unui algoritm de deep parsing care suportă obiecte în obiecte
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Laborator 11 -> cookie
+// Laborator 11 -> cookie & sessions
 app.use(cookieParser());
+app.use(session());
 
 // la accesarea din browser adresei http://localhost:6789/ se va returna textul 'Hello World'
 // proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
 // proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
 app.get('/', (req, res) => {
+
 	//console.log(req.cookies);
-
-	//if (req.cookies) {
-		//res.render('index', {utilizator: req.cookies.utilizator});
-	//} else {
-		//res.render('index');
-	//}
-
 	res.render('index', {utilizator: req.cookies.utilizator});
 });
 
@@ -54,6 +50,7 @@ app.post('/rezultat-chestionar', (req, res) => {
 
 	if(listaIntrebari) {
 		const respunsuriPrimite = req.body;
+		console.log(respunsuriPrimite);
 
 		let numarRaspunsuriCorecte = 0;
 
@@ -73,17 +70,33 @@ app.get('/autentificare', (req, res) => {
 });
 
 app.post('/verificare-autentificare', (req, res) => {
+	
 	//console.log(req.body);
 
-	// logica spre '/' sau '/autentificare'
-	//res.render('');
-	if (req.body.user == "ana" && req.body.pass == "mere") {
-		res.cookie("utilizator", req.body.user);
-		res.redirect('http://localhost:6789/');
-	} else {
-		res.cookie("utilizator", "mesajEroare");
-		res.redirect('http://localhost:6789/autentificare');
-	}
+	const fs = require('fs');	
+	fs.readFile('utilizatori.json', (err, data) => {
+		if (err) throw err;
+		let listaUseri = JSON.parse(data);
+
+		let ok =0;
+		for (let i=0;i<listaUseri.length;i++) {
+			//console.log(listaUseri[i].username + " " + listaUseri[i].password);
+
+			if (listaUseri[i].username == req.body.user && listaUseri[i].password == req.body.pass) {
+				ok=1;
+
+				res.cookie("utilizator", listaUseri[i].username);	//  {nume: listaUseri[i].nume, prenume: listaUseri[i].prenume}
+				
+				res.redirect('http://localhost:6789/');
+			}
+		}
+
+		if (ok == 0) {
+			res.cookie("utilizator", "mesajEroare");
+
+			res.redirect('http://localhost:6789/autentificare');
+		}
+	})
 });
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`));

@@ -1,0 +1,29 @@
+[
+    {
+        "username": "admin",
+        "password": "admin",
+        "nume": "Administrator",
+        "prenume": "The Boss"
+    },
+
+    {
+        "username": "vlad",
+        "password": "tiger",
+        "nume": "Paraschiv",
+        "prenume": "Vlad"
+    },
+
+    {
+        "username": "luca",
+        "password": "luca",
+        "nume": "Luca",
+        "prenume": "Razvan"
+    },
+
+    {
+        "username": "ana",
+        "password": "mere",
+        "nume": "Mucescu",
+        "prenume": "Ana"
+    }
+]
