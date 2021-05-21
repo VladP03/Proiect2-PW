@@ -1,5 +1,18 @@
 <% if (utilizator == "mesajEroare" || utilizator == undefined) { %>
     <a href="/autentificare"> Autentificare </a>
 <% } else { %> 
+    <p class="topRightCorner"> Logat ca <%= utilizator %>. <u><a href="/delogare">Delogare</a></u></p> 
     <h2> Bine ai venit, <%= utilizator %>!</h2>
 <% } %>
+
+<!-- Butonul de creare BD -->
+<br><br>
+<form action="/creare-bd" method="GET">
+    <input type="submit" value="Creare-BD">
+</form>
+
+<!-- Butonul de inserare BD -->
+<br>
+<form action="/inserare-bd" method="GET">
+    <input type="submit" value="Inserare-BD">
+</form>
