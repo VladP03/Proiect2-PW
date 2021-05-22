@@ -5,9 +5,6 @@ const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
 const { Console } = require('console');
 
-const oracledb = require('oracledb');
-oracledb.autoCommit = true;
-
 const app = express();
 
 const port = 6789;
@@ -34,9 +31,16 @@ app.use(session({
 	//}
 }));
 
+// Laborator 12 -> Oracle
+const oracledb = require('oracledb');
+oracledb.autoCommit = true;
+
 // la accesarea din browser adresei http://localhost:6789/ se va returna textul 'Hello World'
 // proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
 // proprietățile obiectului Response - res - https://expressjs.com/en/api.html#res
+
+session.utilizator = undefined;
+
 app.get('/', (req, res) => {
 
 	//console.log(req.cookies);
@@ -60,7 +64,7 @@ app.get('/chestionar', (req, res) => {
 		listaIntrebari = JSON.parse(data);
 
 		// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
-		res.render('chestionar', {intrebari: listaIntrebari});
+		res.render('chestionar', {intrebari: listaIntrebari, utilizator: req.session.utilizator});
 	});
 });
 
@@ -80,7 +84,7 @@ app.post('/rezultat-chestionar', (req, res) => {
 			}
 		}
 		
-		res.render("rezultat-chestionar", { 'corecte' : numarRaspunsuriCorecte, 'total' :  listaIntrebari.length});
+		res.render("rezultat-chestionar", { 'corecte' : numarRaspunsuriCorecte, 'total' :  listaIntrebari.length, utilizator: req.session.utilizator});
 	}
 });
 

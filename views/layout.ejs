@@ -11,6 +11,10 @@
     <body>
         <header>
             <img src="/imagini/logo.png" width="500px" height="200px"> <br> <br>
+
+            <% if (utilizator != "mesajEroare" && utilizator != undefined) { %>
+                <p class="topRightCorner"> Logat ca <%= utilizator %>. <u><a href="/delogare">Delogare</a></u></p> 
+            <% } %>
         </header>
 
         <nav>
