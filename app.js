@@ -5,45 +5,12 @@ const expressLayouts = require('express-ejs-layouts');
 const bodyParser = require('body-parser');
 const { Console } = require('console');
 
+const oracledb = require('oracledb');
+oracledb.autoCommit = true;
+
 const app = express();
 
 const port = 6789;
-
-// laborator 12
-const conString ="Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=orcl)));User Id=C##pw;Password=pw;";
-const oracledb = require('oracledb');
-oracledb.getConnection(
-    {
-      user: 'C##PW', 
-      password: 'pw',
-      connectString: conString
-    }, 
-    function(err, connection) {
-      if (err) {error = err; return;}
-      
-      connection.execute('select id from test', [], function(err, result) {
-        if (err) {error = err; return;}
- 
-        console.log(result.rows[0][0]);
-        
- 
-        connection.close(function(err) {
-          if (err) {console.log(err);}
-        });
-      })
-    }
-);
-
-/*
-const oracledb = require('oracledb');
-try {
-  oracledb.initOracleClient({libDir: 'C:\\oracle\\instantclient_19_6'});
-} catch (err) {
-  console.error('Whoops!');
-  console.error(err);
-  process.exit(1);
-}
-*/
 
 // directorul 'views' va conține fișierele .ejs (html + js executat la server)
 app.set('view engine', 'ejs');
@@ -163,17 +130,36 @@ app.get('/delogare', (req,res) => {
 
 app.get('/creare-bd', (req, res) => {
 	// TO DO cu baza de date
-	//console.log("Am intrat in creare-bd");
+	let connection;
+	const conString ="(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=orcl)))";
 
-	module.exports = {
-		user          : "C##pw",
-		password      : "pw",
-		connectString : "localhost/orcl"
-	};
+	(async function() {
+		try{
+		   connection = await oracledb.getConnection({
+				user          : "C##PW",
+				password      : "pw",
+				connectString : conString
+		   });
+		   console.log("Successfully connected to Oracle!")
 
-	const sql = "SELECT * FROM TEST;";
-	console.log()
+		   await connection.execute(`CREATE TABLE cumparaturi (
+				produs          VARCHAR2(255)       NOT NULL,
+				pret            integer             NOT NULL,
+				cantitate       integer             NOT NULL
+			)`);
 
+		} catch(err) {
+			console.log("Error: ", err);
+		  } finally {
+			if (connection) {
+			  try {				
+				  await connection.close();
+			  } catch(err) {
+				console.log("Error when closing the database connection: ", err);
+			  }
+			}
+		  }
+		})()
 
 	// Redirect pe pagina principala
 	res.redirect('http://localhost:6789/');
@@ -181,8 +167,34 @@ app.get('/creare-bd', (req, res) => {
 
 app.get('/inserare-bd', (req, res) => {
 	// TO DO cu baza de date
-	//console.log("Am intrat in inserare-bd");
+	let connection;
+	const conString ="(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=orcl)))";
 
+	(async function() {
+		try{
+		   connection = await oracledb.getConnection({
+				user          : "C##PW",
+				password      : "pw",
+				connectString : conString
+		   });
+		   console.log("Successfully connected to Oracle!")
+
+		   await connection.execute(`INSERT INTO cumparaturi VALUES ('paine', 50, 1)`);
+		   await connection.execute(`INSERT INTO cumparaturi VALUES ('branza', 50, 2)`);
+		   await connection.execute(`INSERT INTO cumparaturi VALUES ('lapte', 50, 1)`);
+
+		} catch(err) {
+			console.log("Error: ", err);
+		  } finally {
+			if (connection) {
+			  try {				
+				  await connection.close();
+			  } catch(err) {
+				console.log("Error when closing the database connection: ", err);
+			  }
+			}
+		  }
+		})()
 	// Redirect pe pagina principala
 	res.redirect('http://localhost:6789/');
 });
