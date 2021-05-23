@@ -4,6 +4,31 @@
     <h2> Bine ai venit, <%= utilizator %>!</h2>
 <% } %>
 
+<br><br>
+
+<table>
+    <tr>
+        <th> Id </th>
+        <th> Produs </th>
+        <th> Pret (lei) </th>
+    </tr>
+        <% for (let i=0;i<produs.length;i++) { %>
+        <tr>
+            <td> <%= id[i] %> </td>
+            <td> <%= produs[i] %> </td>         <!-- Denumire produs -->
+            <td> <%= pret[i] %> </td>           <!-- Pret produs -->
+            <% if(utilizator != "mesajEroare" && utilizator!=undefined) { %>
+                <td>
+                    <form action="/adaugare_cos" method="GET">
+                        <button type="submit"> Adaugă în coș </button>
+                        <input type="hidden" name="id" value="<%=id[i]%>">
+                    </form>
+                </td>
+            <% } %>
+        <% } %>
+        </tr>
+</table>
+
 <!-- Butonul de creare BD -->
 <br><br>
 <form action="/creare-bd" method="GET">

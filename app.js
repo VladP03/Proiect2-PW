@@ -34,6 +34,7 @@ app.use(session({
 // Laborator 12 -> Oracle
 const oracledb = require('oracledb');
 oracledb.autoCommit = true;
+const conString ="(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=orcl)))";
 
 // la accesarea din browser adresei http://localhost:6789/ se va returna textul 'Hello World'
 // proprietățile obiectului Request - req - https://expressjs.com/en/api.html#req
@@ -42,16 +43,45 @@ oracledb.autoCommit = true;
 session.utilizator = undefined;
 
 app.get('/', (req, res) => {
+	let connection;
 
-	//console.log(req.cookies);
+	var id = [];				// pentru id
+	var produs = [];			// pentru produse
+	var pret = [];				// pentru preturi
 
-	if (!req.session.content) {
-		req.session.count = 1;
-	} else {
-		req.session.count += 1;
-	}
+	(async function() {
+		try{
+		   connection = await oracledb.getConnection({
+				user          : "C##PW",
+				password      : "pw",
+				connectString : conString
+		   });
+		   	console.log("Successfully connected to Oracle!")
 
-	res.render('index', {utilizator: req.session.utilizator});
+			const result = await connection.execute(`SELECT * from cumparaturi`,);
+		  
+		   	for (let i=0;i< result.rows.length;i++) {
+				id[i] = result.rows[i][0];
+				produs[i] = result.rows[i][1];
+				pret[i] = result.rows[i][2];
+		   	}
+
+			res.render('index', {utilizator: req.session.utilizator, id: id, produs: produs, pret: pret});
+			   
+		} catch(err) {
+			console.log("Error: ", err);
+		  } finally {
+			if (connection) {
+			  try {				
+				  await connection.close();
+			  } catch(err) {
+				console.log("Error when closing the database connection: ", err);
+			  }
+			}
+		  }
+		})()
+
+	//res.render('index', {utilizator: req.session.utilizator, id: id, produs: produs, pret: pret});
 });
 
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
@@ -135,7 +165,6 @@ app.get('/delogare', (req,res) => {
 app.get('/creare-bd', (req, res) => {
 	// TO DO cu baza de date
 	let connection;
-	const conString ="(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=orcl)))";
 
 	(async function() {
 		try{
@@ -146,10 +175,12 @@ app.get('/creare-bd', (req, res) => {
 		   });
 		   console.log("Successfully connected to Oracle!")
 
-		   await connection.execute(`CREATE TABLE cumparaturi (
+		   //await connection.execute(`DROP TABLE cumparaturi`);
+		   await connection.execute(`
+		   CREATE TABLE cumparaturi (
+				id              integer             GENERATED ALWAYS AS IDENTITY(START WITH 1 INCREMENT BY 1),
 				produs          VARCHAR2(255)       NOT NULL,
-				pret            integer             NOT NULL,
-				cantitate       integer             NOT NULL
+				pret            integer             NOT NULL
 			)`);
 
 		} catch(err) {
@@ -172,20 +203,18 @@ app.get('/creare-bd', (req, res) => {
 app.get('/inserare-bd', (req, res) => {
 	// TO DO cu baza de date
 	let connection;
-	const conString ="(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521)))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=orcl)))";
 
 	(async function() {
 		try{
-		   connection = await oracledb.getConnection({
+		   let connection = await oracledb.getConnection({
 				user          : "C##PW",
 				password      : "pw",
 				connectString : conString
 		   });
 		   console.log("Successfully connected to Oracle!")
 
-		   await connection.execute(`INSERT INTO cumparaturi VALUES ('paine', 50, 1)`);
-		   await connection.execute(`INSERT INTO cumparaturi VALUES ('branza', 50, 2)`);
-		   await connection.execute(`INSERT INTO cumparaturi VALUES ('lapte', 50, 1)`);
+		   await connection.execute(`INSERT INTO cumparaturi(produs, pret) VALUES ('creion', 2)`);
+		   await connection.execute(`INSERT INTO cumparaturi(produs, pret) VALUES ('foaie A4', 1)`);
 
 		} catch(err) {
 			console.log("Error: ", err);
@@ -201,6 +230,45 @@ app.get('/inserare-bd', (req, res) => {
 		})()
 	// Redirect pe pagina principala
 	res.redirect('http://localhost:6789/');
+});
+
+session.produse = [];
+app.get('/adaugare_cos', (req,res) => {	
+
+	const id = req.query.id;
+	let connection;
+
+	(async function() {
+		try{
+		   let connection = await oracledb.getConnection({
+				user          : "C##PW",
+				password      : "pw",
+				connectString : conString
+		   });
+		   console.log("Successfully connected to Oracle!")
+
+		   let result = await connection.execute("SELECT * FROM cumparaturi WHERE id = " + id + "");
+		   session.produse[session.produse.length] = result.rows;
+
+		   console.log(session.produse);
+
+		   res.redirect('http://localhost:6789/');
+
+		} catch(err) {
+			console.log("Error: ", err);
+		  } finally {
+			if (connection) {
+			  try {				
+				  await connection.close();
+			  } catch(err) {
+				console.log("Error when closing the database connection: ", err);
+			  }
+			}
+		  }
+		})()
+
+	// Redirect pe pagina principala
+	//res.redirect('http://localhost:6789/');
 });
 
 
