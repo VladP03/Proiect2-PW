@@ -138,10 +138,11 @@ app.post('/verificare-autentificare', (req, res) => {
 			if (listaUseri[i].username == req.body.user && listaUseri[i].password == req.body.pass) {
 				ok=1;
 
-				res.cookie("utilizator", listaUseri[i].username);	//  {nume: listaUseri[i].nume, prenume: listaUseri[i].prenume}
+				res.cookie("utilizator", listaUseri[i].username);
 				req.session.utilizator = listaUseri[i].username
 				req.session.nume = listaUseri[i].nume;
 				req.session.prenume = listaUseri[i].prenume;
+				req.session.role = listaUseri[i].role;		// rolul pentru resursa /admin
 
 				res.redirect('http://localhost:6789/');
 			}
@@ -279,5 +280,13 @@ app.get('/vizualizare-cos', (req,res) => {
 	res.render('vizualizare-cos', {utilizator: req.session.utilizator, produse: session.produse});
 });
 
+app.get('/admin', (req,res) => {	
+
+	if (req.session.role == "admin") {
+		res.render('admin',{ utilizator: req.session.utilizator});
+	} else {
+		res.send("No acces");
+	}
+});
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`));

@@ -3,27 +3,31 @@
         "username": "admin",
         "password": "admin",
         "nume": "Administrator",
-        "prenume": "The Boss"
+        "prenume": "The Boss",
+        "role": "admin"
     },
 
     {
         "username": "vlad",
         "password": "tiger",
         "nume": "Paraschiv",
-        "prenume": "Vlad"
+        "prenume": "Vlad",
+        "role": "user"
     },
 
     {
         "username": "luca",
         "password": "luca",
         "nume": "Luca",
-        "prenume": "Razvan"
+        "prenume": "Razvan",
+        "role": "user"
     },
 
     {
         "username": "ana",
         "password": "mere",
         "nume": "Mucescu",
-        "prenume": "Ana"
+        "prenume": "Ana",
+        "role": "user"
     }
 ]
