@@ -1,0 +1,12 @@
+<table>
+    <tr>
+        <th> Produs </th>
+        <th> Pret (lei) </th>
+    </tr>
+        <% for (let i=0;i<produse.length;i++) { %>
+        <tr>
+            <td> <%= produse[i].produs %> </td>         <!-- Denumire produs -->
+            <td> <%= produse[i].pret %> </td>           <!-- Pret produs -->
+        <% } %>
+        </tr>
+</table>

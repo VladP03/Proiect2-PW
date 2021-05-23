@@ -248,7 +248,10 @@ app.get('/adaugare_cos', (req,res) => {
 		   console.log("Successfully connected to Oracle!")
 
 		   let result = await connection.execute("SELECT * FROM cumparaturi WHERE id = " + id + "");
-		   session.produse[session.produse.length] = result.rows;
+		   session.produse[session.produse.length] = {
+				"produs": result.rows[0][1],
+				"pret": result.rows[0][2]
+		   };
 
 		   console.log(session.produse);
 
@@ -269,6 +272,11 @@ app.get('/adaugare_cos', (req,res) => {
 
 	// Redirect pe pagina principala
 	//res.redirect('http://localhost:6789/');
+});
+
+app.get('/vizualizare-cos', (req,res) => {	
+
+	res.render('vizualizare-cos', {utilizator: req.session.utilizator, produse: session.produse});
 });
 
 
