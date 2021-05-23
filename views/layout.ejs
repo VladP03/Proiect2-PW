@@ -12,12 +12,23 @@
         <header>
             <img src="/imagini/logo.png" width="500px" height="200px"> <br> <br>
 
-            <% if (utilizator != "mesajEroare" && utilizator != undefined) { %>
-                <p class="topRightCorner"> Logat ca <%= utilizator %>. <u><a href="/delogare">Delogare</a></u></p> 
+            <% if (session.utilizator != "mesajEroare" && session.utilizator != undefined) { %>
+                <p class="topRightCorner"> Logat ca <%= session.utilizator %>. <u><a href="/delogare">Delogare</a></u></p> 
             <% } %>
         </header>
 
         <nav>
+            <ul>
+                <li><a href="http://localhost:6789/"> Home </a></li>
+                <li><a href="http://localhost:6789/chestionar"> Chestionar </a></li>
+                <li><a href="http://localhost:6789/vizualizare-cos"> Vizualizare cos </a></li>
+
+                <% if (session.utilizator == "mesajEroare" || session.utilizator == undefined) { %>
+                    <li style="float:right"><a href="http://localhost:6789/autentificare"> Login </a></li>
+                <% } else if (session.role == "admin") { %>
+                    <li style="float:right"><a href="http://localhost:6789/admin"> Admin </a></li>
+                <% } %>
+            </ul>
         </nav>
 
         <main>

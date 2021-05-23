@@ -1,12 +1,27 @@
-<table>
-    <tr>
-        <th> Produs </th>
-        <th> Pret (lei) </th>
-    </tr>
-        <% for (let i=0;i<produse.length;i++) { %>
+<% if (produse.length == 0) { %>
+    <p>
+        Nu aveti nici un produs in cos
+    </p>
+<% } else { %>
+    <br>
+    <table>
         <tr>
-            <td> <%= produse[i].produs %> </td>         <!-- Denumire produs -->
-            <td> <%= produse[i].pret %> </td>           <!-- Pret produs -->
-        <% } %>
+            <th> Produs </th>
+            <th> Pret (lei) </th>
         </tr>
-</table>
+            <% for (let i=0;i<produse.length;i++) { %>
+            <tr>
+                <td> <%= produse[i].produs %> </td>         <!-- Denumire produs -->
+                <td> <%= produse[i].pret %> </td>           <!-- Pret produs -->
+            <% } %>
+            </tr>
+    </table>
+
+    <% var total = 0 %>
+    <% for (let i=0;i<produse.length;i++) { %>
+        <% total += produse[i].pret %>
+    <% } %>
+    <p>
+        Total = <%= total %> lei
+    </p>
+<% } %>

@@ -56,9 +56,9 @@ app.get('/', (req, res) => {
 				password      : "pw",
 				connectString : conString
 		   });
-		   	console.log("Successfully connected to Oracle!")
+		   	//console.log("Successfully connected to Oracle!")
 
-			const result = await connection.execute(`SELECT * from cumparaturi`,);
+			const result = await connection.execute(`SELECT * from cumparaturi ORDER BY id`,);
 		  
 		   	for (let i=0;i< result.rows.length;i++) {
 				id[i] = result.rows[i][0];
@@ -66,7 +66,7 @@ app.get('/', (req, res) => {
 				pret[i] = result.rows[i][2];
 		   	}
 
-			res.render('index', {utilizator: req.session.utilizator, id: id, produs: produs, pret: pret});
+			res.render('index', {session: req.session, id: id, produs: produs, pret: pret});
 			   
 		} catch(err) {
 			console.log("Error: ", err);
@@ -79,9 +79,7 @@ app.get('/', (req, res) => {
 			  }
 			}
 		  }
-		})()
-
-	//res.render('index', {utilizator: req.session.utilizator, id: id, produs: produs, pret: pret});
+		})();
 });
 
 // la accesarea din browser adresei http://localhost:6789/chestionar se va apela funcția specificată
@@ -94,7 +92,7 @@ app.get('/chestionar', (req, res) => {
 		listaIntrebari = JSON.parse(data);
 
 		// în fișierul views/chestionar.ejs este accesibilă variabila 'intrebari' care conține vectorul de întrebări
-		res.render('chestionar', {intrebari: listaIntrebari, utilizator: req.session.utilizator});
+		res.render('chestionar', {intrebari: listaIntrebari, session: req.session});
 	});
 });
 
@@ -114,12 +112,12 @@ app.post('/rezultat-chestionar', (req, res) => {
 			}
 		}
 		
-		res.render("rezultat-chestionar", { 'corecte' : numarRaspunsuriCorecte, 'total' :  listaIntrebari.length, utilizator: req.session.utilizator});
+		res.render("rezultat-chestionar", { 'corecte' : numarRaspunsuriCorecte, 'total' :  listaIntrebari.length, session: req.session});
 	}
 });
 
 app.get('/autentificare', (req, res) => {
-	res.render('autentificare', {utilizator: req.cookies.utilizator});
+	res.render('autentificare', {utilizator: req.cookies.utilizator, session: req.session});
 });
 
 app.post('/verificare-autentificare', (req, res) => {
@@ -160,6 +158,8 @@ app.get('/delogare', (req,res) => {
 	res.clearCookie('utilizator');
 	req.session.utilizator = undefined;
 
+	session.produse = [];
+
 	res.redirect('/');
 });
 
@@ -174,15 +174,22 @@ app.get('/creare-bd', (req, res) => {
 				password      : "pw",
 				connectString : conString
 		   });
-		   console.log("Successfully connected to Oracle!")
+		   //console.log("Successfully connected to Oracle!")
 
 		   //await connection.execute(`DROP TABLE cumparaturi`);
+		   await connection.execute(`
+		   		DROP TABLE cumparaturi
+			`);
+
 		   await connection.execute(`
 		   CREATE TABLE cumparaturi (
 				id              integer             GENERATED ALWAYS AS IDENTITY(START WITH 1 INCREMENT BY 1),
 				produs          VARCHAR2(255)       NOT NULL,
 				pret            integer             NOT NULL
 			)`);
+
+			// Redirect pe pagina principala
+			res.redirect('http://localhost:6789/');
 
 		} catch(err) {
 			console.log("Error: ", err);
@@ -195,10 +202,7 @@ app.get('/creare-bd', (req, res) => {
 			  }
 			}
 		  }
-		})()
-
-	// Redirect pe pagina principala
-	res.redirect('http://localhost:6789/');
+		})();
 });
 
 app.get('/inserare-bd', (req, res) => {
@@ -212,10 +216,13 @@ app.get('/inserare-bd', (req, res) => {
 				password      : "pw",
 				connectString : conString
 		   });
-		   console.log("Successfully connected to Oracle!")
+		   //console.log("Successfully connected to Oracle!")
 
 		   await connection.execute(`INSERT INTO cumparaturi(produs, pret) VALUES ('creion', 2)`);
 		   await connection.execute(`INSERT INTO cumparaturi(produs, pret) VALUES ('foaie A4', 1)`);
+
+		   	// Redirect pe pagina principala
+			res.redirect('http://localhost:6789/');
 
 		} catch(err) {
 			console.log("Error: ", err);
@@ -228,9 +235,7 @@ app.get('/inserare-bd', (req, res) => {
 			  }
 			}
 		  }
-		})()
-	// Redirect pe pagina principala
-	res.redirect('http://localhost:6789/');
+		})();
 });
 
 session.produse = [];
@@ -246,7 +251,7 @@ app.get('/adaugare_cos', (req,res) => {
 				password      : "pw",
 				connectString : conString
 		   });
-		   console.log("Successfully connected to Oracle!")
+		   //console.log("Successfully connected to Oracle!")
 
 		   let result = await connection.execute("SELECT * FROM cumparaturi WHERE id = " + id + "");
 		   session.produse[session.produse.length] = {
@@ -256,7 +261,8 @@ app.get('/adaugare_cos', (req,res) => {
 
 		   console.log(session.produse);
 
-		   res.redirect('http://localhost:6789/');
+		   	// Redirect pe pagina principala
+		   //res.redirect('http://localhost:6789/');
 
 		} catch(err) {
 			console.log("Error: ", err);
@@ -269,21 +275,18 @@ app.get('/adaugare_cos', (req,res) => {
 			  }
 			}
 		  }
-		})()
-
-	// Redirect pe pagina principala
-	//res.redirect('http://localhost:6789/');
+		})();
 });
 
 app.get('/vizualizare-cos', (req,res) => {	
 
-	res.render('vizualizare-cos', {utilizator: req.session.utilizator, produse: session.produse});
+	res.render('vizualizare-cos', {session: req.session, produse: session.produse});
 });
 
 app.get('/admin', (req,res) => {	
 
 	if (req.session.role == "admin") {
-		res.render('admin',{ utilizator: req.session.utilizator});
+		res.render('admin',{ session: req.session});
 	} else {
 		res.send("No acces");
 	}
