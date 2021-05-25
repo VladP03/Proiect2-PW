@@ -246,7 +246,7 @@ app.get('/adaugare_cos', (req,res) => {
 
 	(async function() {
 		try{
-		   let connection = await oracledb.getConnection({
+		   connection = await oracledb.getConnection({
 				user          : "C##PW",
 				password      : "pw",
 				connectString : conString
@@ -290,6 +290,38 @@ app.get('/admin', (req,res) => {
 	} else {
 		res.send("No acces");
 	}
+});
+
+app.post('/adauga-produs-in-BD', (req,res) => {	
+
+	let connection;
+	(async function() {
+		try{
+			connection = await oracledb.getConnection({
+				user          : "C##PW",
+				password      : "pw",
+				connectString : conString
+		   });
+		   //console.log("Successfully connected to Oracle!")
+		   
+		   await connection.execute("INSERT INTO cumparaturi(produs, pret) VALUES (\'" + req.body.DenumireProdusDeAdaugat + "\', " + req.body.PretProdusDeAdaugat + ")");
+		   console.log("produs adaugat cu succes");
+
+		   	// Redirect pe pagina principala
+		   res.redirect('http://localhost:6789/');
+
+		} catch(err) {
+			console.log("Error: ", err);
+		  } finally {
+			if (connection) {
+			  try {				
+				  await connection.close();
+			  } catch(err) {
+				console.log("Error when closing the database connection: ", err);
+			  }
+			}
+		  }
+		})();
 });
 
 app.listen(port, () => console.log(`Serverul rulează la adresa http://localhost:`));
